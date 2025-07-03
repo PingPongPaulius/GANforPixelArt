@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+import torch.nn.functional as F
 
 
 class Generator(nn.Module):
@@ -12,9 +13,7 @@ class Generator(nn.Module):
         self.output_layer = nn.Linear(1024, output_size).to(cuda)
 
     def forward(self, x):
-        relu = nn.ReLU(True)
-        tanh = nn.Tanh()
-        x = relu(self.input_layer(x))
-        x = relu(self.hidden_layer(x))
-        x = relu(self.hidden_2_layer(x))
-        return tanh(self.output_layer(x))
+        x = F.leaky_relu(self.input_layer(x), 0.2)
+        x = F.leaky_relu(self.hidden_layer(x), 0.2)
+        x = F.leaky_relu(self.hidden_2_layer(x), 0.2)
+        return torch.tanh(self.output_layer(x))
